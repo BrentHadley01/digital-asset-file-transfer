@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Digital Asset Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Digital Asset Manager</h1>
+        
+        <div class="upload-section">
+            <label for="imageInput" class="custom-file-upload">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Choose Files to Upload
+            </label>
+            <input type="file" id="imageInput" multiple accept="image/*" onchange="updateSelectedFilesText()">
+            <div class="file-selected-text" style="display: none;"></div>
+            <button onclick="uploadFiles()">Upload Images</button>
+        </div>
+
+        <div class="prefix-section">
+            <input type="text" id="prefixInput" placeholder="Enter prefix for renaming files...">
+        </div>
+
+        <div id="imageList" class="image-list">
+            <!-- Files will be listed here -->
+        </div>
+
+        <div class="actions">
+            <button onclick="renameFiles()">Rename Files</button>
+            <button onclick="ftpTransfer()">Transfer to FTP</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
