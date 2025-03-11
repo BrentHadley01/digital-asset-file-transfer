@@ -131,23 +131,35 @@ async function startServer() {
         const client = new ftp.Client(30000);
         try {
             client.ftp.verbose = true;
-            console.log('Attempting FTP connection');
+            console.log('Attempting FTP connection to remote server');
             
             await client.access({
                 host: process.env.FTP_HOST,
-                port: process.env.FTP_PORT || 21,
+                port: parseInt(process.env.FTP_PORT) || 21,
                 user: process.env.FTP_USER,
                 password: process.env.FTP_PASSWORD,
-                secure: true,
-                secureOptions: { rejectUnauthorized: false }
+                secure: process.env.FTP_SECURE === 'true',
+                secureOptions: { 
+                    rejectUnauthorized: false 
+                }
             });
 
             console.log('FTP Connection successful');
 
+            // Create remote directory with timestamp if needed
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const uploadDir = `uploads_${timestamp}`;
+            
+            try {
+                await client.ensureDir(uploadDir);
+                await client.cd(uploadDir);
+            } catch (err) {
+                console.log('Directory creation failed, using root directory');
+            }
+
             const sessionFiles = req.session.uploadedFiles || [];
             for (const file of sessionFiles) {
                 console.log(`Starting upload of: ${file.originalName}`);
-                // Convert buffer object to Buffer instance
                 const fileBuffer = Buffer.from(file.buffer.data);
                 const { Readable } = require('stream');
                 const stream = new Readable({
@@ -161,7 +173,10 @@ async function startServer() {
                 console.log(`Completed upload of: ${file.originalName}`);
             }
 
-            res.json({ success: true });
+            res.json({ 
+                success: true,
+                message: `Files uploaded to ${uploadDir || 'root directory'}`
+            });
         } catch (err) {
             console.error('FTP Error:', err);
             res.status(500).json({ 
